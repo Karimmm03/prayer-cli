@@ -29,7 +29,4 @@ var todayCmd = &cobra.Command{
 
 func init(){
 	rootCmd.AddCommand(todayCmd)
-
-	todayCmd.Flags().StringP("city", "c", "", "City name (e.g. 'New York')")
-	todayCmd.Flags().StringP("country", "C", "", "Country name or code (e.g. 'US')")
 }
