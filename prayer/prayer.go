@@ -80,13 +80,26 @@ func GetCurrentAndNext (schedule *Schedule)(current, next *Prayer){
 			next = &schedule.Prayers[i]
 			if i > 0{
 				current = &schedule.Prayers[i-1]
+			} else {
+				isha := schedule.Prayers[len(schedule.Prayers)-1]
+				current = &Prayer{
+					Name: isha.Name,
+					Time: isha.Time.AddDate(0, 0, -1),
+				}
 			}
 			return current, next
 		}
 	}
 
 	last := &schedule.Prayers[len(schedule.Prayers) - 1]
-	return last, nil
+	first := schedule.Prayers[0]
+	
+	nextDayFajr := &Prayer{
+		Name: first.Name,
+		Time: first.Time.AddDate(0, 0, 1),
+	}
+
+	return last, nextDayFajr
 }
 
 func TimeRemaining (next *Prayer) string{
