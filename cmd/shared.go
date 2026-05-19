@@ -17,11 +17,11 @@ func getLocationString(loc *location.Location) string{
 }
 
 func resolveLocation (city, country string) (*location.Location, error){
-	if city == "" && country != "" {
-		return nil, fmt.Errorf("you must provide a --city when using --country")
+	if (city != "" && country == "") || (city == "" && country != "") {
+		return nil, fmt.Errorf("you must provide both --city and --country together")
 	}
 
-	if city != ""{
+	if city != "" && country != "" {
 		return &location.Location{City: city, Country: country}, nil
 	}
 
