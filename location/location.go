@@ -14,7 +14,14 @@ type Location struct{
 func GetFromIP() (*Location, error){
 	url := "https://ipapi.co/json/"
 
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil{
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+	req.Header.Set("User-Agent", "prayer-cli/1.0")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil{
 		return nil, fmt.Errorf("failed to reach location API: %w", err)
 	}
@@ -35,4 +42,4 @@ func GetFromIP() (*Location, error){
 	}
 
 	return &loc, nil
-}
+}
