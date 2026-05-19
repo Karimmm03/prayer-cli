@@ -5,10 +5,12 @@ import (
 )
 
 func TestGetPrayerTimes(t *testing.T){
-	timings, err := GetPrayerTimes("Cairo", "Egypt")
+	data, err := GetPrayerTimes("Cairo", "Egypt")
 	if err != nil{
 		t.Fatalf("expected no error, got: %v", err)
 	}
+
+	timings := data.Timings
 
 	if timings.Fajr == ""{
 		t.Error("expected Fajr time, got empty string")
@@ -26,10 +28,12 @@ func TestGetPrayerTimes(t *testing.T){
 }
 
 func TestGetPrayerTimesManualCity(t *testing.T){
-	timings, err := GetPrayerTimes("New York", "US")
+	data, err := GetPrayerTimes("New York", "US")
 	if err != nil{
 		t.Fatalf("expected no error, got: %v", err)
 	}
+
+	timings := data.Timings
 
 	if timings.Fajr == ""{
 		t.Error("expected Fajr time, got empty string")

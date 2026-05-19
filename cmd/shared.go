@@ -29,12 +29,12 @@ func resolveLocation (city, country string) (*location.Location, error){
 }
 
 func fetchSchedule (loc *location.Location) (*prayer.Schedule, error){
-	timings, err := api.GetPrayerTimes(loc.City, loc.Country)
+	data, err := api.GetPrayerTimes(loc.City, loc.Country)
 	if err != nil{
 		return nil, fmt.Errorf("could not fetch prayer times: %w", err)
 	}
 
-	schedule, err := prayer.BuildSchedule(timings)
+	schedule, err := prayer.BuildSchedule(data)
 	if err != nil{
 		return nil, fmt.Errorf("could not build schedule: %w", err)
 	}

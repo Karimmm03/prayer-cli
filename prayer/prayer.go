@@ -16,21 +16,33 @@ type Schedule struct{
 	Prayers []Prayer
 }
 
-func BuildSchedule (timings *api.PrayerTimings)(*Schedule, error){
+func BuildSchedule (data *api.PrayerData)(*Schedule, error){
 	rawTimes := []struct{
 		name string
 		raw string
 	}{
-		{"Fajr", timings.Fajr},
-		{"Sunrise", timings.Sunrise},
-		{"Dhuhr", timings.Dhuhr},
-		{"Asr", timings.Asr},
-		{"Maghrib", timings.Maghrib},
-		{"Isha", timings.Isha},
+		{"Fajr", data.Timings.Fajr},
+		{"Sunrise", data.Timings.Sunrise},
+		{"Dhuhr", data.Timings.Dhuhr},
+		{"Asr", data.Timings.Asr},
+		{"Maghrib", data.Timings.Maghrib},
+		{"Isha", data.Timings.Isha},
 	}
+
+	var loc *time.Location
+	if data.Timezone != ""{
+		parsedLoc, err := time.LoadLocation(data.Timezone)
+		if err == nil{
+			loc = parsedLoc
+		}
+	}
+	if loc == nil{
+		loc = time.Local
+	}
+
 	var prayers []Prayer
 	for _, p := range rawTimes{
-		t, err := parseTime(p.raw)
+		t, err := parseTime(p.raw, loc)
 		if err != nil{
 			return nil, fmt.Errorf("failed to parse %s time: %w", p.name, err)
 		}
@@ -40,8 +52,7 @@ func BuildSchedule (timings *api.PrayerTimings)(*Schedule, error){
 	return &Schedule{Prayers: prayers}, nil
 }
 
-func parseTime (raw string)(time.Time, error){
-	now := time.Now()
+func parseTime (raw string, loc *time.Location)(time.Time, error){
 	if len(raw) > 5{
 		raw = raw[:5] // sometimes api returns "HH:MM (EET)" with some info so we need only "HH:MM"
 	}
@@ -49,14 +60,20 @@ func parseTime (raw string)(time.Time, error){
 	if err != nil{
 		return time.Time{}, err
 	}
-
+	
+	now := time.Now().In(loc)
 	return time.Date(
-		now.Year(), now.Month(), now.Day(), t.Hour(), t.Minute(), 0, 0, now.Location(),
+		now.Year(), now.Month(), now.Day(), t.Hour(), t.Minute(), 0, 0, loc,
 	), nil
 }
 
 func GetCurrentAndNext (schedule *Schedule)(current, next *Prayer){
-	now := time.Now()
+	if len(schedule.Prayers) == 0{
+		return nil, nil
+	}
+	
+	loc := schedule.Prayers[0].Time.Location()
+	now := time.Now().In(loc)
 
 	for i, p := range schedule.Prayers{
 		if now.Before(p.Time){

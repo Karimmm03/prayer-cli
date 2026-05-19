@@ -8,16 +8,19 @@ import (
 )
 
 func TestBuildSchedule(t *testing.T){
-	timings := &api.PrayerTimings{
-		Fajr:    "04:21",
-		Sunrise: "06:01",
-		Dhuhr:   "12:51",
-		Asr:     "16:28",
-		Maghrib: "19:42",
-		Isha:    "21:10",
+	data := &api.PrayerData{
+		Timezone: "UTC",
+		Timings: api.PrayerTimings{
+			Fajr:    "04:21",
+			Sunrise: "06:01",
+			Dhuhr:   "12:51",
+			Asr:     "16:28",
+			Maghrib: "19:42",
+			Isha:    "21:10",
+		},
 	}
 
-	schedule, err := BuildSchedule(timings)
+	schedule, err := BuildSchedule(data)
 	if err != nil{
 		t.Fatalf("expected no error, got: %v", err)
 	}

@@ -16,15 +16,23 @@ type PrayerTimings struct{
 	Isha    string `json:"Isha"`
 }
 
+type PrayerData struct{
+	Timings  PrayerTimings
+	Timezone string
+}
+
 type apiResponse struct{
 	Code   int    `json:"code"`
 	Status string `json:"status"`
 	Data   struct{
 		Timings PrayerTimings `json:"timings"`
+		Meta    struct {
+			Timezone string `json:"timezone"`
+		} `json:"meta"`
 	} `json:"data"`
 }
 
-func GetPrayerTimes(city, country string) (*PrayerTimings, error){
+func GetPrayerTimes(city, country string) (*PrayerData, error){
 	params := url.Values{}
 	params.Set("city", city)
 	params.Set("method", "5") // Muslim World League method
@@ -54,5 +62,8 @@ func GetPrayerTimes(city, country string) (*PrayerTimings, error){
 		return nil, fmt.Errorf("AlAdhan API error: %s", result.Status)
 	}
 
-	return &result.Data.Timings, nil
+	return &PrayerData{
+		Timings:  result.Data.Timings,
+		Timezone: result.Data.Meta.Timezone,
+	}, nil
 }
