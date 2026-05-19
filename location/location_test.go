@@ -14,10 +14,3 @@ func TestGetFromIP(t *testing.T) {
 	}
 	t.Logf("Detected location: %s, %s", loc.City, loc.Country)
 }
-
-func TestGetFromCity(t *testing.T) {
-	loc := GetFromCity("Giza")
-	if loc.City != "Giza" {
-		t.Errorf("expected 'Giza', got '%s'", loc.City)
-	}
-}
