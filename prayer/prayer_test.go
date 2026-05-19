@@ -73,3 +73,69 @@ func TestGetCurrentAndNext(t *testing.T){
 	t.Logf("Current: %s, Next: %s", current.Name, next.Name)
 	t.Logf("Time remaining: %s", TimeRemaining(next))
 }
+
+func TestGetCurrentAndNext_BeforeFajr(t *testing.T){
+	now := time.Now()
+
+	schedule := &Schedule{
+		Prayers: []Prayer{
+			{Name: "Fajr", Time: now.Add(1 * time.Hour)},
+			{Name: "Sunrise", Time: now.Add(2 * time.Hour)},
+			{Name: "Dhuhr", Time: now.Add(4 * time.Hour)},
+			{Name: "Asr", Time: now.Add(5 * time.Hour)},
+			{Name: "Maghrib", Time: now.Add(7 * time.Hour)},
+			{Name: "Isha", Time: now.Add(9 * time.Hour)},
+		},
+	}
+
+	current, next := GetCurrentAndNext(schedule)
+
+	if current == nil || next == nil{
+		t.Fatal("expected current and next prayers, got nil")
+	}
+
+	if current.Name != "Isha"{
+		t.Errorf("expected current to be Isha (yesterday), got %s", current.Name)
+	}
+	if next.Name != "Fajr"{
+		t.Errorf("expected next to be Fajr (today), got %s", next.Name)
+	}
+	
+	expectedIshaTime := schedule.Prayers[5].Time.AddDate(0, 0, -1)
+	if !current.Time.Equal(expectedIshaTime) {
+		t.Errorf("expected current time to be yesterday's Isha")
+	}
+}
+
+func TestGetCurrentAndNext_AfterIsha(t *testing.T){
+	now := time.Now()
+
+	schedule := &Schedule{
+		Prayers: []Prayer{
+			{Name: "Fajr", Time: now.Add(-9 * time.Hour)},
+			{Name: "Sunrise", Time: now.Add(-7 * time.Hour)},
+			{Name: "Dhuhr", Time: now.Add(-5 * time.Hour)},
+			{Name: "Asr", Time: now.Add(-4 * time.Hour)},
+			{Name: "Maghrib", Time: now.Add(-2 * time.Hour)},
+			{Name: "Isha", Time: now.Add(-1 * time.Hour)},
+		},
+	}
+
+	current, next := GetCurrentAndNext(schedule)
+
+	if current == nil || next == nil{
+		t.Fatal("expected current and next prayers, got nil")
+	}
+
+	if current.Name != "Isha"{
+		t.Errorf("expected current to be Isha (today), got %s", current.Name)
+	}
+	if next.Name != "Fajr"{
+		t.Errorf("expected next to be Fajr (tomorrow), got %s", next.Name)
+	}
+
+	expectedFajrTime := schedule.Prayers[0].Time.AddDate(0, 0, 1)
+	if !next.Time.Equal(expectedFajrTime) {
+		t.Errorf("expected next time to be tomorrow's Fajr")
+	}
+}
