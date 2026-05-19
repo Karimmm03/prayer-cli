@@ -35,10 +35,4 @@ func GetFromIP() (*Location, error){
 	}
 
 	return &loc, nil
-}
-
-func GetFromCity(cityName string) *Location{
-	return &Location{
-		City: cityName,
-	}
-}
+}
