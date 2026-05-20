@@ -55,6 +55,14 @@ If you run a command without any flags, it will attempt to **auto-detect** your 
 
 ---
 
+## Output Examples
+
+![pray today](assets/today.png)
+
+![pray now](assets/now_flags.png)
+
+![pray next](assets/next.png)
+
 ## Project Structure
  
 ```
